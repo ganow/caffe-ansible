@@ -1,0 +1,71 @@
+---
+- hosts: 127.0.0.1
+  user: vagrant
+  vars:
+    work_dir: /home/vagrant
+    repos_dir: "{{ work_dir }}/caffe"
+  tasks:
+  # Install prerequirements
+  - name: "Install general dependencies"
+    sudo: yes
+    apt: pkg="libboost-all-dev" install_recommends=no
+
+  - name: "Install general dependensies for Caffe"
+    sudo: yes
+    apt: name="{{ item }}" state=present
+    with_items:
+      - "libprotobuf-dev"
+      - "libleveldb-dev"
+      - "libsnappy-dev"
+      - "libopencv-dev"
+      - "libhdf5-serial-dev"
+      - "protobuf-compiler"
+      - "libatlas-base-dev"
+      - "libgflags-dev"
+      - "libgoogle-glog-dev"
+      - "liblmdb-dev"
+      - "git"
+
+  # Compile Caffe
+  - name: "Cloning Caffe on GitHub"
+    git: repo=https://github.com/BVLC/caffe.git dest={{ repos_dir }}
+  - name: "Get Makefile.config"
+    shell: creates="{{ repos_dir }}/Makefile.config" cp /vagrant/Makefile.config "{{ repos_dir }}/Makefile.config"
+  - name: "Compile Caffe"
+    shell: make all chdir="{{ repos_dir }}"
+  - name: "Compile Caffe test"
+    shell: make test chdir="{{ repos_dir }}"
+  - name: "Run test for Caffe"
+    shell: make runtest chdir="{{ repos_dir }}"
+
+  # Install Python requirements for Caffe
+  - name: "Install Python requirements for Caffe (by apt-get)"
+    sudo: yes
+    apt: name="{{ item }}"
+    with_items:
+      - python-numpy
+      - python-scipy
+      - python-dev
+      - python-nose
+  - name: "Install Python requirements for Caffe"
+    sudo: yes
+    pip: requirements="{{ repos_dir }}/python/requirements.txt"
+
+  - name: "Make Python wrapper for Caffe"
+    shell: make py chdir="{{ repos_dir }}"
+
+  # Setup IPython Notebook
+  - name: "Install requirements for IPython Notebook"
+    sudo: yes
+    pip: name="{{ item }}"
+    with_items:
+      - pyzmq
+      - tornado
+      - jinja2
+      - jsonschema
+
+  # Download ilsvrc12 dataset
+  - name: "Download ilsvrc12 dataset"
+    shell: ./get_ilsvrc_aux.sh chdir="{{ repos_dir }}/data/ilsvrc12" creates="{{ repos_dir }}/data/ilsvrc12/train.txt"
+
+
