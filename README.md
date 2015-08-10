@@ -3,6 +3,7 @@ Minimal caffe environment build by ansible
 
 ```bash
 git clone git clone https://github.com/ganow/caffe-ansible.git
+cd caffe-ansible
 
 vagrant up
 vagrant ssh -- -L 8888:localhost:8888
