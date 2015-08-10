@@ -6,7 +6,7 @@ Minimal caffe environment build by ansible
 Clone this repository into your project directory.
 
 ```bash
-git clone git clone https://github.com/ganow/caffe-ansible.git /path/to/caffe-ansible
+git clone https://github.com/ganow/caffe-ansible.git /path/to/caffe-ansible
 ```
 
 Start VM and access to it.
