@@ -35,6 +35,7 @@ ansible-playbook playbook.yml -i localhost
 Boot up IPython Notebook.
 
 ```bash
+cd ~/caffe
 ipython notebook --no-browser
 ```
 
